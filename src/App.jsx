@@ -3,6 +3,7 @@ import { useIdleTimer } from "react-idle-timer";
 
 const App = () => {
   const [remaining, setRemaining] = useState(0);
+  const [isUserIdle, setIsUserIdle] = useState(false);
   const [lastIdleDuration, setLastIdleDuration] = useState(0);
   const [activeDuration, setActiveDuration] = useState(0);
 
@@ -45,7 +46,10 @@ const App = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isIdle()) {
+        setIsUserIdle(false);
         setActiveDuration((prev) => prev + 1);
+      } else {
+        setIsUserIdle(true);
       }
 
       setRemaining(Math.round(getRemainingTime() / 1000));
@@ -58,7 +62,7 @@ const App = () => {
     <div>
       <h1>React Idle Timer Example</h1>
       <p>You will be logged out after 30 seconds of inactivity.</p>
-      <p style={{ color: isIdle() ? "red" : "green" }}>
+      <p style={{ color: isUserIdle ? "red" : "green" }}>
         -----------------------------------------------------------------
       </p>
       <p>Remaining time to logout: {remaining} seconds</p>
