@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useIdleTimer } from "react-idle-timer";
+import styles from "./app.module.css";
 
 const App = () => {
+  const timeout = 1000 * 30; // 30 seconds
+  const promptBeforeIdle = 1000 * 10; // show prompt 10 seconds before idle
+
   const [remaining, setRemaining] = useState(0);
-  const [isUserIdle, setIsUserIdle] = useState(false);
   const [lastIdleDuration, setLastIdleDuration] = useState(0);
   const [activeDuration, setActiveDuration] = useState(0);
+  const [isUserIdle, setIsUserIdle] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   const idleStartTime = useRef(null);
 
@@ -25,10 +30,23 @@ const App = () => {
 
   const onAction = (event) => {
     console.log(`User did ${event.type} — timer reset`);
+    setShowPrompt(false);
   };
 
-  const { getRemainingTime, isIdle } = useIdleTimer({
-    timeout: 1000 * 30,
+  const onPrompt = () => {
+    console.log("Prompting user to stay active");
+    setShowPrompt(true);
+  };
+
+  const handleStillHere = () => {
+    console.log("User clicked 'I'm still here'");
+    activate();
+  };
+
+  const { getRemainingTime, isIdle, activate } = useIdleTimer({
+    timeout,
+    promptBeforeIdle,
+    onPrompt,
     onIdle,
     onActive,
     onAction,
@@ -41,6 +59,7 @@ const App = () => {
       "scroll",
       "wheel",
     ],
+    crossTab: true, // Optional if using multiple tabs
   });
 
   useEffect(() => {
@@ -49,6 +68,7 @@ const App = () => {
         setIsUserIdle(false);
         setActiveDuration((prev) => prev + 1);
       } else {
+        setShowPrompt(false);
         setIsUserIdle(true);
       }
 
@@ -59,15 +79,38 @@ const App = () => {
   }, [getRemainingTime]);
 
   return (
-    <div>
-      <h1>React Idle Timer Example</h1>
-      <p>You will be logged out after 30 seconds of inactivity.</p>
-      <p style={{ color: isUserIdle ? "red" : "green" }}>
-        -----------------------------------------------------------------
+    <div className={styles.container}>
+      <h1 className={styles.title}>React Idle Timer Example</h1>
+      <p className={styles.description}>
+        You will be logged out after 30 seconds of inactivity.
       </p>
-      <p>Remaining time to logout: {remaining} seconds</p>
-      <p>Last idle duration: {lastIdleDuration} seconds</p>
-      <p>Current active duration: {activeDuration} seconds</p>
+      <p
+        className={styles.status}
+        style={{
+          color: isUserIdle ? "red" : "green",
+        }}
+      >
+        {isUserIdle ? "🛑 You are idle" : "✅ You are active"}
+      </p>
+      <div className={styles.timer}>
+        <p>
+          <strong>Remaining time to idle:</strong> {remaining} seconds
+        </p>
+        <p>
+          <strong>Last idle duration:</strong> {lastIdleDuration} seconds
+        </p>
+        <p>
+          <strong>Current active duration:</strong> {activeDuration} seconds
+        </p>
+      </div>
+      {showPrompt && (
+        <>
+          <p className={styles.prompt}>⚠️ You are about to become idle! </p>
+          <button className={styles.button} onClick={handleStillHere}>
+            Im still here
+          </button>
+        </>
+      )}
     </div>
   );
 };

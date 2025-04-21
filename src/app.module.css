@@ -1,0 +1,54 @@
+.container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.title {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 16px;
+  color: #666;
+}
+
+.status {
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+.timer {
+  margin-top: 20px;
+  background-color: teal;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.prompt {
+  color: orange;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.button {
+  padding: 0.6rem 1.2rem;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #1565c0;
+}
