@@ -22,7 +22,7 @@ const App = () => {
   const onActive = () => {
     if (idleStartTime.current) {
       const idleTime = Math.round((Date.now() - idleStartTime.current) / 1000);
-      setLastIdleDuration((prevIdleTime) => prevIdleTime + idleTime);
+      // setLastIdleDuration((prevIdleTime) => prevIdleTime + idleTime);
       console.log(`User was idle for ${idleTime} seconds`);
       idleStartTime.current = null;
     }
@@ -70,6 +70,7 @@ const App = () => {
       } else {
         setShowPrompt(false);
         setIsUserIdle(true);
+        setLastIdleDuration((prev) => prev + 1);
       }
 
       setRemaining(Math.round(getRemainingTime() / 1000));
@@ -97,10 +98,10 @@ const App = () => {
           <strong>Remaining time to idle:</strong> {remaining} seconds
         </p>
         <p>
-          <strong>Last idle duration:</strong> {lastIdleDuration} seconds
+          <strong>Total idle duration:</strong> {lastIdleDuration} seconds
         </p>
         <p>
-          <strong>Current active duration:</strong> {activeDuration} seconds
+          <strong>Total active duration:</strong> {activeDuration} seconds
         </p>
       </div>
       {showPrompt && (
