@@ -30,7 +30,10 @@ const App = () => {
 
   const onAction = (event) => {
     console.log(`User did ${event.type} — timer reset`);
-    setShowPrompt(false);
+    if (showPrompt) {
+      activate();
+      setShowPrompt(false);
+    }
   };
 
   const onPrompt = () => {
@@ -38,10 +41,10 @@ const App = () => {
     setShowPrompt(true);
   };
 
-  const handleStillHere = () => {
-    console.log("User clicked 'I'm still here'");
-    activate();
-  };
+  // const handleStillHere = () => {
+  //   console.log("User clicked 'I'm still here'");
+  //   activate();
+  // };
 
   const { getRemainingTime, isIdle, activate } = useIdleTimer({
     timeout,
@@ -107,9 +110,9 @@ const App = () => {
       {showPrompt && (
         <>
           <p className={styles.prompt}>⚠️ You are about to become idle! </p>
-          <button className={styles.button} onClick={handleStillHere}>
+          {/* <button className={styles.button} onClick={handleStillHere}>
             I'm still here
-          </button>
+          </button> */}
         </>
       )}
     </div>
