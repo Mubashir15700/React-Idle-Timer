@@ -31,6 +31,13 @@
   border-radius: 5px;
 }
 
+.remaining {
+  background-color: wheat;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+}
+
 .prompt {
   color: orange;
   font-weight: bold;

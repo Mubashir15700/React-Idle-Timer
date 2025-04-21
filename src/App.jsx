@@ -52,7 +52,7 @@ const App = () => {
     onAction,
     debounce: 500,
     events: [
-      // "mousemove",
+      "mousemove",
       "mousedown",
       "keydown",
       "touchstart",
@@ -94,7 +94,7 @@ const App = () => {
         {isUserIdle ? "🛑 You are idle" : "✅ You are active"}
       </p>
       <div className={styles.timer}>
-        <p>
+        <p className={styles.remaining}>
           <strong>Remaining time to idle:</strong> {remaining} seconds
         </p>
         <p>
@@ -108,7 +108,7 @@ const App = () => {
         <>
           <p className={styles.prompt}>⚠️ You are about to become idle! </p>
           <button className={styles.button} onClick={handleStillHere}>
-            Im still here
+            I'm still here
           </button>
         </>
       )}
