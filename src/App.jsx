@@ -32,12 +32,14 @@ const App = () => {
     console.log(`User did ${event.type} — timer reset`);
     if (showPrompt) {
       activate();
+      localStorage.setItem("showPrompt", false);
       setShowPrompt(false);
     }
   };
 
   const onPrompt = () => {
     console.log("Prompting user to stay active");
+    localStorage.setItem("showPrompt", true);
     setShowPrompt(true);
   };
 
@@ -46,7 +48,14 @@ const App = () => {
   //   activate();
   // };
 
-  const { getRemainingTime, isIdle, activate } = useIdleTimer({
+  const {
+    getRemainingTime,
+    isIdle,
+    activate,
+    getTabId,
+    isLeader,
+    isLastActiveTab,
+  } = useIdleTimer({
     timeout,
     promptBeforeIdle,
     onPrompt,
@@ -63,24 +72,70 @@ const App = () => {
       "wheel",
     ],
     crossTab: true, // Optional if using multiple tabs
+    leaderElection: true,
+    syncTimers: 200,
   });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!isIdle()) {
-        setIsUserIdle(false);
-        setActiveDuration((prev) => prev + 1);
+      const remaining = Math.round(getRemainingTime() / 1000);
+      setRemaining(remaining);
+
+      const idle = isIdle();
+      setIsUserIdle(idle);
+
+      if (isLeader()) localStorage.setItem("remainingTime", remaining);
+
+      if (!idle) {
+        setActiveDuration((prev) => {
+          const updated = prev + 1;
+          if (isLeader()) localStorage.setItem("activeDuration", updated);
+          return updated;
+        });
       } else {
         setShowPrompt(false);
-        setIsUserIdle(true);
-        setLastIdleDuration((prev) => prev + 1);
+        localStorage.setItem("showPrompt", false);
+        setLastIdleDuration((prev) => {
+          const updated = prev + 1;
+          if (isLeader()) localStorage.setItem("lastIdleDuration", updated);
+          return updated;
+        });
       }
-
-      setRemaining(Math.round(getRemainingTime() / 1000));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [getRemainingTime]);
+  }, [getRemainingTime, isIdle, isLeader]);
+
+  useEffect(() => {
+    const syncDurations = (event) => {
+      if (event.key === "activeDuration") {
+        setActiveDuration(Number(event.newValue));
+      }
+      if (event.key === "lastIdleDuration") {
+        setLastIdleDuration(Number(event.newValue));
+      }
+      if (event.key === "remainingTime") {
+        setRemaining(Number(event.newValue));
+      }
+      if (event.key === "showPrompt") {
+        setShowPrompt(event.newValue === "true");
+      }
+    };
+
+    window.addEventListener("storage", syncDurations);
+    return () => window.removeEventListener("storage", syncDurations);
+  }, []);
+
+  useEffect(() => {
+    if (isLeader()) {
+      console.log("I am the leader. I will handle API calls.");
+    }
+  }, [isLeader]);
+
+  const tabId = getTabId() === null ? "loading" : getTabId().toString();
+  const lastActiveTab =
+    isLastActiveTab() === null ? "loading" : isLastActiveTab().toString();
+  const leader = isLeader() === null ? "loading" : isLeader().toString();
 
   return (
     <div className={styles.container}>
@@ -106,6 +161,14 @@ const App = () => {
         <p>
           <strong>Total active duration:</strong> {activeDuration} seconds
         </p>
+        <p>
+          -----------------------------------------------------------------------------------------------------------
+        </p>
+        <div>
+          <p>Tab ID: {tabId}</p>
+          <p>Last Active Tab: {lastActiveTab}</p>
+          <p>Is Leader Tab: {leader}</p>
+        </div>
       </div>
       {showPrompt && (
         <>
